@@ -1,0 +1,14 @@
+.spiner-simple {
+  position: absolute;
+  background-color: black;
+  opacity: 0.5;
+  height: 100% !important;
+  z-index: 100;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  width: 100% !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+

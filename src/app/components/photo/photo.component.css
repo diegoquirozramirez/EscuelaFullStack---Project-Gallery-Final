@@ -23,3 +23,9 @@ label {
    background-image: url('https://material.angular.io/assets/img/examples/shiba1.jpg');
    background-size: cover;
  }
+
+ .center-photo {   
+   justify-content: center;
+   align-items: center;
+   margin: 20px 0px 10px 0px;
+ }

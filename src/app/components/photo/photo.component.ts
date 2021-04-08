@@ -2,6 +2,8 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { PhotoService } from '../../services/photo/photo.service'
 import { Photo } from '../../models/photo/photoModel'
 
+
+
 @Component({
   selector: 'app-photo',
   templateUrl: './photo.component.html',
@@ -12,7 +14,9 @@ export class PhotoComponent implements OnInit {
   public photos: Array<Photo>;
   public conditional: Boolean;
   public photo: Photo;
-  public dataFilter: String;
+  public dataFilter: string;
+
+  public loading = false;
 
   @ViewChild('form') form;
   @ViewChild('form2') form2;
@@ -26,7 +30,9 @@ export class PhotoComponent implements OnInit {
    }
 
   ngOnInit(): void {
+    this.loading = true;
     this.getPhotos();
+    this.loading = false;
   }
 
   /**
@@ -47,18 +53,21 @@ export class PhotoComponent implements OnInit {
   }
 
 
-  processFile(imageInput: any){
+  async processFile(imageInput: any){
     console.log(imageInput.files)
     console.log(imageInput.files[0])
     
     const file: File = imageInput.files[0];
     const reader = new FileReader();
 
-    reader.addEventListener('load', (event: any) => {
-      this.photo = new Photo(Date.now().toString(), file.name , event.target.result, new Date, '999,999');
-
+    reader.addEventListener('load', async (event: any) => {
+      this.photo = new Photo(Date.now().toString(), file.name , event.target.result, new Date, '999,999', 0);
+      this.loading = true;
       this._service.postPhoto(this.photo).subscribe(
         res => {
+          setTimeout( () => {
+            this.loading = false;
+          }, 3000)
           console.log("Exitoso", res);
           this.getPhotos();
         },
@@ -67,19 +76,24 @@ export class PhotoComponent implements OnInit {
         }
       )
     });
-
+    
     reader.readAsDataURL(file);
-
   }
 
 
   filter(){
     const resutl = this.photos.filter( v => v.nombre == this.dataFilter );
     if(resutl.length == 0){
-      alert("No se encontraron imagenes disponibles")
+      alert("No se encontraron imagenes disponibles");
     }else{
-      this.photos = resutl;
+      this.photos = resutl;      
     }
+
+  }
+
+  clearFilter(){
+    this.dataFilter = "";
+    this.getPhotos();
   }
 
   deletePhoto(id: String){
@@ -87,7 +101,7 @@ export class PhotoComponent implements OnInit {
     this._service.deletePhoto(id).subscribe(
       res => {
         console.log("Se elimino");
-        this.photos = this.photos.filter(v => v.id != id);
+        //this.photos = this.photos.filter(v => v.id != id);
       },
       err => {
         console.log("hubo un error", err)
@@ -102,12 +116,12 @@ export class PhotoComponent implements OnInit {
     this.form2.nativeElement.reset();
 
     reader.addEventListener('load', (event: any) => {
-      this.photo = new Photo(id, file.name , event.target.result, new Date, '999,999');
+      this.photo = new Photo(id, file.name , event.target.result, new Date, '999,999', 0);
 
       this._service.putPhoto(id, this.photo).subscribe(
         res => {
           console.log("Exitoso", res);
-          this.photo = new Photo("", "", "", "", '');
+          this.photo = new Photo("", "", "", "", '', 0);
           this.getPhotos();
         },
         err => {
@@ -122,6 +136,32 @@ export class PhotoComponent implements OnInit {
 
   reset(){
     this.form.nativeElement.reset();
+  }
+
+  sendLike(id){
+    this._service.getOnePhoto(id).subscribe(
+      res => {
+        this.photo = new Photo(res.id, res.nombre, res.src, res.date, res.views, res.likes);
+        this.photo.likes = this.photo.likes + 1;
+        
+        this._service.putPhoto(id, this.photo).subscribe(
+          resp => {
+            console.log(resp);
+            this.getPhotos();
+            if(this.photo.likes % 3 === 0) {
+              alert("Wuao, esta foto esta genial")
+            }
+          },
+          erro => {
+            console.error(erro);
+            
+          }
+        )
+      },
+      err => {
+        console.error(err)
+      }
+    )
   }
 
 }

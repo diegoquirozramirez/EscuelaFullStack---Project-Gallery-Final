@@ -1,16 +1,15 @@
-
+<app-spiner-simple *ngIf="loading"></app-spiner-simple>
 
    
 <div class="tm-hero d-flex justify-content-center align-items-center" data-parallax="scroll" data-image-src="../../../assets/img/hero.jpg">
     <div class="col-6">
         <form class="d-flex tm-search-form">
             <label style="margin-left: 10%;" class="form-control tm-search-input" for="upload-photo">Upload Video...</label>
-            <input #imageInput accept="video/" (change)="processFile(imageInput)" class="btn btn-outline-success tm-search-btn"  id="upload-photo" type="file" placeholder="Search" aria-label="Search">
+            <input #videoInput accept="video/" (change)="processFile(videoInput)" class="btn btn-outline-success tm-search-btn"  id="upload-photo" type="file" placeholder="Search" aria-label="Search">
         </form>
     </div>
     
 </div>
-
 
 <div class="container">
     <div class="container-fluid tm-container-content tm-mt-60">
@@ -22,13 +21,13 @@
 
 
         <div class="row tm-mb-90 tm-gallery" >
-            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-5" *ngFor="let photo of photos">
+            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-5" *ngFor="let video of videos">
                 <figure class="effect-ming tm-video-item">
-                    <video src="{{photo.src}}" alt="Image" class="img-fluid" ></video>        
+                    <video src="{{video.src}}" alt="Image" class="img-fluid" controls></video>        
                 </figure>
                 <div class="d-flex justify-content-between tm-text-gray">
-                    <span class="tm-text-gray-light">{{photo.id}}</span>
-                    <span>{{photo.views}} views</span>
+                    <span class="tm-text-gray-light">{{video.id}}</span>
+                    <span>{{video.views}} views</span>
                 </div>
                 
                 <div class="d-flex justify-content-between tm-text-gray" style="margin-top: 25px;">
@@ -36,15 +35,16 @@
                         <label for="upload-photo2" class="btn btn-outline-success">
                             EDITAR
                         </label>
-                        <input #imageUpdate accept="image/" name="imagen2" (change)="updatePhoto(photo.id, imageUpdate)" class="btn btn-outline-success tm-search-btn"  id="upload-photo2" type="file">
+                        <input #videoUpdate accept="video/" name="imagen2" (change)="updatePhoto(video.id, videoUpdate)" class="btn btn-outline-success tm-search-btn"  id="upload-photo2" type="file">
                     </form>
                     
                  
                     <!-- <button class="btn btn-outline-success">EDITAR</button> -->
-                    <button class="btn btn-outline-danger" (click)="deletePhoto(photo.id)">ELIMINAR</button>
+                    <button class="btn btn-outline-danger" (click)="deleteVideo(video.id)">ELIMINAR</button>
                 </div>
             </div>
             
         </div> <!-- row -->
     </div>
+    
 </div>

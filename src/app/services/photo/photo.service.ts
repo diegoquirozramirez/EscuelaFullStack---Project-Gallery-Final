@@ -38,4 +38,8 @@ export class PhotoService {
     return this._http.delete(`${this.baseURL}/photo/${id}`).pipe( map( res => res ) );
   }
 
+  getOnePhoto(id: string):Observable<any>{
+    return this._http.get(`${this.baseURL}/photo/${id}`).pipe( map( res => res ) );
+  }
+
 }

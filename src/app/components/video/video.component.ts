@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Photo } from '../../models/photo/photoModel';
-import { PhotoService } from '../../services/photo/photo.service'
+import { Video } from '../../models/video/videoModel';
+import { VideoService } from '../../services/video/video.service'
 
 @Component({
   selector: 'app-video',
@@ -9,12 +9,18 @@ import { PhotoService } from '../../services/photo/photo.service'
 })
 export class VideoComponent implements OnInit {
 
-  public photo: Photo;
-  public photos: Array<Photo>
+  public video: Video;
+  public videos: Array<Video>;
+  public loading: boolean;
+
+  public typeContent: string = "data:video/webm;base64,";
+  public contentDecoded: string;
 
   constructor(
-    private _services: PhotoService
-  ) { }
+    private _services: VideoService
+  ) {
+    this.loading = false;
+   }
 
   ngOnInit(): void {
     this.getVideo();
@@ -22,41 +28,87 @@ export class VideoComponent implements OnInit {
 
 
   getVideo(){
-    this._services.getPhotos().subscribe(
+    this.loading = true;
+    this._services.getVideos().subscribe(
       res => {
         console.log("exito", res);
-        this.photos = res;
+        this.videos = res;        
       },
-      err => {
+      err => {        
         console.log("hubo un error", err)
       }
-    )
+    );
+    this.loading = false;
   }
 
-  processFile(imageInput: any){
-    console.log(imageInput.files)
-    console.log(imageInput.files[0])
+  processFile(videoInput: any){
     
-    const file: File = imageInput.files[0];
+    const file: File = videoInput.files[0];
     const reader = new FileReader();
 
     reader.addEventListener('load', (event: any) => {
-      this.photo = new Photo(Date.now().toString(), file.name , event.target.result, new Date, '999,999');
-
-      this._services.postPhoto(this.photo).subscribe(
+      this.loading = true;
+      this.contentDecoded = (event.target.result).toString().split(",")[1];
+      this.video = new Video(Date.now().toString(), file.name , `${this.typeContent}${this.contentDecoded}`, new Date, '999,999');
+      
+      this._services.postVideo(this.video).subscribe(
         res => {
           console.log("Exitoso", res);
           this.getVideo();
+          this.loading = false;
         },
         err => {
           console.log("hubo un error", err)
         }
       )
     });
-
+    this.loading = false;
     reader.readAsDataURL(file);
 
   }
+
+  deleteVideo(id: any){
+    this.loading = true;
+    this._services.deleteVideo(id).subscribe(
+      res => {
+        this.getVideo();
+        alert("Se eliminó el video" + id)
+      },
+      err => {
+        this.loading = false;
+        alert("No se eliminó el video" + id)
+      }
+    );
+    this.loading = false;
+  }
+
+  updatePhoto(id:string, videoInput: any){
+    console.log("DATOs", id, videoInput)
+    const file: File = videoInput.files[0];
+    const reader = new FileReader();
+
+    reader.addEventListener('load', (event: any) => {
+      this.loading = true;
+      this.contentDecoded = (event.target.result).toString().split(",")[1];
+      this.video = new Video(Date.now().toString(), file.name , `${this.typeContent}${this.contentDecoded}`, new Date, '999,999');
+      
+      this._services.putVideo(id, this.video).subscribe(
+        res => {
+          console.log("Actualizacion correcta", res);
+          this.getVideo();
+          this.loading = false;
+        },
+        err => {
+          console.log("hubo un error", err)
+          this.loading = false;
+        }
+      )
+    });
+    this.loading = false;
+    reader.readAsDataURL(file);
+
+  }
+
 
 
 
