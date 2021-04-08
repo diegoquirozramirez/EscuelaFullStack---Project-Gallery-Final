@@ -11,25 +11,25 @@ import { Photo } from '../../models/photo/photoModel'
 })
 export class PhotoComponent implements OnInit {
 
-  public photos: Array<Photo>;
+  public photos: Array<Photo>; // Arreglo de tipo Photo (donde: Photo es una clase de modelo)
   public conditional: Boolean;
   public photo: Photo;
   public dataFilter: string;
 
   public loading = false;
 
-  @ViewChild('form') form;
+  @ViewChild('form') form; // nos permite referencias elemtos en nuestra plantilla HTML
   @ViewChild('form2') form2;
 
   constructor(
-    private _service: PhotoService
+    private _service: PhotoService // "capa de servicio" --> consumer servicios o endpoints | API REST
     
   ) { 
     this.conditional = false;
     this.dataFilter = "";
    }
 
-  ngOnInit(): void {
+  ngOnInit(): void { // evento dentro del ciclo de vida de un componente primero en renderizar
     this.loading = true;
     this.getPhotos();
     this.loading = false;
@@ -54,12 +54,12 @@ export class PhotoComponent implements OnInit {
 
 
   async processFile(imageInput: any){
-    console.log(imageInput.files)
-    console.log(imageInput.files[0])
-    
+
+    // Eleccion de event entrante para files
     const file: File = imageInput.files[0];
     const reader = new FileReader();
 
+    // registro de evento para elemento FileReader llamada 'load'    
     reader.addEventListener('load', async (event: any) => {
       this.photo = new Photo(Date.now().toString(), file.name , event.target.result, new Date, '999,999', 0);
       this.loading = true;
@@ -101,7 +101,7 @@ export class PhotoComponent implements OnInit {
     this._service.deletePhoto(id).subscribe(
       res => {
         console.log("Se elimino");
-        //this.photos = this.photos.filter(v => v.id != id);
+        this.photos = this.photos.filter(v => v.id != id);
       },
       err => {
         console.log("hubo un error", err)
